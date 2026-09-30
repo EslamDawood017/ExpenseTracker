@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import { FluentProvider, webLightTheme } from '@fluentui/react-components'
 import type { Expense } from './types/expense'
 import { ExpenseList } from './components/ExpenseList'
+import { ExpenseForm } from './components/ExpenseForm'
 
-// Sample temporary data to test our components
 const INITIAL_EXPENSES: Expense[] = [
   {
     id: '1',
@@ -28,6 +29,20 @@ const INITIAL_EXPENSES: Expense[] = [
 ]
 
 function App() {
+  // 1. Dynamic state for expenses, initialized with our mock data
+  const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES)
+
+  // 2. Callback function passed to ExpenseForm
+  const handleAddExpense = (newExpenseData: Omit<Expense, 'id'>) => {
+    const newExpense: Expense = {
+      ...newExpenseData,
+      id: crypto.randomUUID(), // Generates a unique string ID
+    }
+
+    // Immutable update: prepending the new expense to a new array
+    setExpenses((prev) => [newExpense, ...prev])
+  }
+
   return (
     <FluentProvider theme={webLightTheme}>
       <div className="min-h-screen bg-slate-100 py-10 px-4">
@@ -41,11 +56,15 @@ function App() {
             </p>
           </header>
 
+          {/* Form to add an expense */}
+          <ExpenseForm onAddExpense={handleAddExpense} />
+
+          {/* Dynamic list rendering */}
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-3">
               Recent Expenses
             </h2>
-            <ExpenseList expenses={INITIAL_EXPENSES} />
+            <ExpenseList expenses={expenses} />
           </section>
         </main>
       </div>
