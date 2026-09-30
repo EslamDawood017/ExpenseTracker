@@ -29,18 +29,19 @@ const INITIAL_EXPENSES: Expense[] = [
 ]
 
 function App() {
-  // 1. Dynamic state for expenses, initialized with our mock data
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES)
 
-  // 2. Callback function passed to ExpenseForm
   const handleAddExpense = (newExpenseData: Omit<Expense, 'id'>) => {
     const newExpense: Expense = {
       ...newExpenseData,
-      id: crypto.randomUUID(), // Generates a unique string ID
+      id: crypto.randomUUID(),
     }
-
-    // Immutable update: prepending the new expense to a new array
     setExpenses((prev) => [newExpense, ...prev])
+  }
+
+  // 1. Delete handler using immutable .filter()
+  const handleDeleteExpense = (id: string) => {
+    setExpenses((prev) => prev.filter((expense) => expense.id !== id))
   }
 
   return (
@@ -56,15 +57,17 @@ function App() {
             </p>
           </header>
 
-          {/* Form to add an expense */}
           <ExpenseForm onAddExpense={handleAddExpense} />
 
-          {/* Dynamic list rendering */}
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-3">
               Recent Expenses
             </h2>
-            <ExpenseList expenses={expenses} />
+            {/* 2. Pass the delete handler to ExpenseList */}
+            <ExpenseList
+              expenses={expenses}
+              onDeleteExpense={handleDeleteExpense}
+            />
           </section>
         </main>
       </div>
