@@ -14,7 +14,7 @@ export function ExpenseSummary({ expenses }: ExpenseSummaryProps) {
     return (
         <div className="grid grid-cols-2 gap-4">
             {/* Total Count Card */}
-            <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+            <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between summary-count-card">
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Total Expenses
                 </span>
@@ -24,7 +24,7 @@ export function ExpenseSummary({ expenses }: ExpenseSummaryProps) {
             </div>
 
             {/* Total Spent Card */}
-            <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+            <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between summary-spent-card">
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Total Spent
                 </span>

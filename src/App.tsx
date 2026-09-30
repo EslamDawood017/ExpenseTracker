@@ -5,6 +5,7 @@ import { ExpenseList } from './components/ExpenseList'
 import { ExpenseForm } from './components/ExpenseForm'
 import { ExpenseSummary } from './components/ExpenseSummary'
 import { ExpenseFilters } from './components/ExpenseFilters'
+import './App.css'
 
 const STORAGE_KEY = 'expense_tracker_data'
 
@@ -95,7 +96,7 @@ function App() {
       <div className="min-h-screen bg-slate-100 py-10 px-4">
         <main className="max-w-xl mx-auto flex flex-col gap-6">
           <header className="text-center">
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight gradient-title">
               Expense Tracker
             </h1>
             <p className="text-sm text-slate-500 mt-1">

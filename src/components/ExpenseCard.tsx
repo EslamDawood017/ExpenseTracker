@@ -20,7 +20,7 @@ export function ExpenseCard({ expense, onEdit, onDelete }: ExpenseCardProps) {
     const categoryStyle = CATEGORY_STYLES[expense.category] ?? CATEGORY_STYLES.Other
 
     return (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-150 gap-3">
+        <div className="custom-card flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm hover:border-slate-300 transition-all duration-150 gap-3">
             {/* Title & metadata */}
             <div className="flex flex-col gap-1.5">
                 <span className="font-semibold text-slate-800 text-base sm:text-lg tracking-tight">
