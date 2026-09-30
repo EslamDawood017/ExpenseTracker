@@ -14,8 +14,14 @@ export function ExpenseList({
 }: ExpenseListProps) {
     if (expenses.length === 0) {
         return (
-            <div className="text-center py-8 text-slate-500 bg-white rounded-lg border border-slate-200">
-                No expenses found.
+            <div className="text-center py-12 px-4 bg-white rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xl font-semibold mb-3">
+                    $
+                </div>
+                <p className="text-sm font-semibold text-slate-700">No expenses found</p>
+                <p className="text-xs text-slate-400 mt-1 max-w-xs">
+                    Try adjusting your search query or category filter, or add an expense using the form above.
+                </p>
             </div>
         )
     }

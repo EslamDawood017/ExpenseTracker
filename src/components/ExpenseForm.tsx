@@ -78,7 +78,7 @@ export function ExpenseForm({
     return (
         <form
             onSubmit={handleSubmit}
-            className="p-5 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-4"
+            className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm flex flex-col gap-4"
         >
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-slate-800">
