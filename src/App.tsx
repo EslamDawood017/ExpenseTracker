@@ -3,6 +3,7 @@ import { FluentProvider, webLightTheme } from '@fluentui/react-components'
 import type { Expense } from './types/expense'
 import { ExpenseList } from './components/ExpenseList'
 import { ExpenseForm } from './components/ExpenseForm'
+import { ExpenseSummary } from './components/ExpenseSummary'
 
 const INITIAL_EXPENSES: Expense[] = [
   {
@@ -30,8 +31,6 @@ const INITIAL_EXPENSES: Expense[] = [
 
 function App() {
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES)
-
-  // 1. State to track which expense is being edited (null = add mode)
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
 
   const handleAddExpense = (newExpenseData: Omit<Expense, 'id'>) => {
@@ -42,17 +41,15 @@ function App() {
     setExpenses((prev) => [newExpense, ...prev])
   }
 
-  // 2. Immutable update handler using .map()
   const handleUpdateExpense = (updatedExpense: Expense) => {
     setExpenses((prev) =>
       prev.map((expense) =>
         expense.id === updatedExpense.id ? updatedExpense : expense
       )
     )
-    setEditingExpense(null) // Return to add mode after updating
+    setEditingExpense(null)
   }
 
-  // 3. Delete handler (also cancels edit if the deleted item was currently being edited)
   const handleDeleteExpense = (id: string) => {
     setExpenses((prev) => prev.filter((expense) => expense.id !== id))
     if (editingExpense?.id === id) {
@@ -73,7 +70,10 @@ function App() {
             </p>
           </header>
 
-          {/* Form handling both Add and Edit via key */}
+          {/* 1. Summary Cards */}
+          <ExpenseSummary expenses={expenses} />
+
+          {/* 2. Add / Edit Form */}
           <ExpenseForm
             key={editingExpense ? editingExpense.id : 'create'}
             onAddExpense={handleAddExpense}
@@ -82,6 +82,7 @@ function App() {
             onCancelEdit={() => setEditingExpense(null)}
           />
 
+          {/* 3. Expense List */}
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-3">
               Recent Expenses
