@@ -4,6 +4,7 @@ import type { Expense } from './types/expense'
 import { ExpenseList } from './components/ExpenseList'
 import { ExpenseForm } from './components/ExpenseForm'
 import { ExpenseSummary } from './components/ExpenseSummary'
+import { ExpenseFilters } from './components/ExpenseFilters'
 
 const INITIAL_EXPENSES: Expense[] = [
   {
@@ -33,6 +34,10 @@ function App() {
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES)
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
 
+  // 1. Filter criteria states
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('All')
+
   const handleAddExpense = (newExpenseData: Omit<Expense, 'id'>) => {
     const newExpense: Expense = {
       ...newExpenseData,
@@ -57,6 +62,17 @@ function App() {
     }
   }
 
+  // 2. Pure derived data: filtered list recalculated on every render
+  const filteredExpenses = expenses.filter((expense) => {
+    const matchesSearch = expense.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase().trim())
+    const matchesCategory =
+      selectedCategory === 'All' || expense.category === selectedCategory
+
+    return matchesSearch && matchesCategory
+  })
+
   return (
     <FluentProvider theme={webLightTheme}>
       <div className="min-h-screen bg-slate-100 py-10 px-4">
@@ -70,10 +86,9 @@ function App() {
             </p>
           </header>
 
-          {/* 1. Summary Cards */}
+          {/* Overall summary shows all expenses */}
           <ExpenseSummary expenses={expenses} />
 
-          {/* 2. Add / Edit Form */}
           <ExpenseForm
             key={editingExpense ? editingExpense.id : 'create'}
             onAddExpense={handleAddExpense}
@@ -82,13 +97,29 @@ function App() {
             onCancelEdit={() => setEditingExpense(null)}
           />
 
-          {/* 3. Expense List */}
-          <section>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3">
-              Recent Expenses
-            </h2>
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-slate-800">
+                Expenses
+              </h2>
+              {(searchQuery || selectedCategory !== 'All') && (
+                <span className="text-xs text-slate-500">
+                  Showing {filteredExpenses.length} of {expenses.length}
+                </span>
+              )}
+            </div>
+
+            {/* Filter controls */}
+            <ExpenseFilters
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
+
+            {/* Pass the derived filtered list to ExpenseList */}
             <ExpenseList
-              expenses={expenses}
+              expenses={filteredExpenses}
               onEditExpense={setEditingExpense}
               onDeleteExpense={handleDeleteExpense}
             />
