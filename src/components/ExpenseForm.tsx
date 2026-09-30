@@ -4,24 +4,34 @@ import type { Expense, ExpenseCategory } from '../types/expense'
 
 interface ExpenseFormProps {
     onAddExpense: (expense: Omit<Expense, 'id'>) => void
+    editingExpense: Expense | null
+    onUpdateExpense: (expense: Expense) => void
+    onCancelEdit: () => void
 }
 
 const CATEGORIES: ExpenseCategory[] = ['Food', 'Transport', 'Shopping', 'Bills', 'Other']
 
-export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
-    // 1. Controlled State for form fields
-    const [title, setTitle] = useState('')
-    const [amount, setAmount] = useState('')
-    const [category, setCategory] = useState<ExpenseCategory>('Food')
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+export function ExpenseForm({
+    onAddExpense,
+    editingExpense,
+    onUpdateExpense,
+    onCancelEdit,
+}: ExpenseFormProps) {
+    // Pre-fill fields if we are editing, otherwise use defaults
+    const [title, setTitle] = useState(editingExpense ? editingExpense.title : '')
+    const [amount, setAmount] = useState(editingExpense ? editingExpense.amount.toString() : '')
+    const [category, setCategory] = useState<ExpenseCategory>(
+        editingExpense ? editingExpense.category : 'Food'
+    )
+    const [date, setDate] = useState(
+        editingExpense ? editingExpense.date : new Date().toISOString().split('T')[0]
+    )
 
-    // Simple validation error message state
     const [error, setError] = useState('')
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
 
-        // Basic validation
         if (!title.trim()) {
             setError('Please enter a title.')
             return
@@ -38,19 +48,30 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
             return
         }
 
-        // Call parent callback with form data
-        onAddExpense({
-            title: title.trim(),
-            amount: parsedAmount,
-            category,
-            date,
-        })
+        if (editingExpense) {
+            // Edit mode: update existing expense preserving its id
+            onUpdateExpense({
+                id: editingExpense.id,
+                title: title.trim(),
+                amount: parsedAmount,
+                category,
+                date,
+            })
+        } else {
+            // Add mode: create new expense
+            onAddExpense({
+                title: title.trim(),
+                amount: parsedAmount,
+                category,
+                date,
+            })
+            // Reset form fields
+            setTitle('')
+            setAmount('')
+            setCategory('Food')
+            setDate(new Date().toISOString().split('T')[0])
+        }
 
-        // Reset form fields
-        setTitle('')
-        setAmount('')
-        setCategory('Food')
-        setDate(new Date().toISOString().split('T')[0])
         setError('')
     }
 
@@ -59,7 +80,16 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
             onSubmit={handleSubmit}
             className="p-5 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-4"
         >
-            <h2 className="text-lg font-semibold text-slate-800">Add New Expense</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-slate-800">
+                    {editingExpense ? 'Edit Expense' : 'Add New Expense'}
+                </h2>
+                {editingExpense && (
+                    <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        Editing Mode
+                    </span>
+                )}
+            </div>
 
             {error && (
                 <div className="p-2.5 text-xs text-red-700 bg-red-50 border border-red-200 rounded">
@@ -107,9 +137,14 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
                 </Field>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end gap-2 pt-2">
+                {editingExpense && (
+                    <Button appearance="secondary" type="button" onClick={onCancelEdit}>
+                        Cancel
+                    </Button>
+                )}
                 <Button appearance="primary" type="submit">
-                    Add Expense
+                    {editingExpense ? 'Update Expense' : 'Add Expense'}
                 </Button>
             </div>
         </form>

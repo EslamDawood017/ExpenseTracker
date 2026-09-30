@@ -31,6 +31,9 @@ const INITIAL_EXPENSES: Expense[] = [
 function App() {
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES)
 
+  // 1. State to track which expense is being edited (null = add mode)
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
+
   const handleAddExpense = (newExpenseData: Omit<Expense, 'id'>) => {
     const newExpense: Expense = {
       ...newExpenseData,
@@ -39,9 +42,22 @@ function App() {
     setExpenses((prev) => [newExpense, ...prev])
   }
 
-  // 1. Delete handler using immutable .filter()
+  // 2. Immutable update handler using .map()
+  const handleUpdateExpense = (updatedExpense: Expense) => {
+    setExpenses((prev) =>
+      prev.map((expense) =>
+        expense.id === updatedExpense.id ? updatedExpense : expense
+      )
+    )
+    setEditingExpense(null) // Return to add mode after updating
+  }
+
+  // 3. Delete handler (also cancels edit if the deleted item was currently being edited)
   const handleDeleteExpense = (id: string) => {
     setExpenses((prev) => prev.filter((expense) => expense.id !== id))
+    if (editingExpense?.id === id) {
+      setEditingExpense(null)
+    }
   }
 
   return (
@@ -57,15 +73,22 @@ function App() {
             </p>
           </header>
 
-          <ExpenseForm onAddExpense={handleAddExpense} />
+          {/* Form handling both Add and Edit via key */}
+          <ExpenseForm
+            key={editingExpense ? editingExpense.id : 'create'}
+            onAddExpense={handleAddExpense}
+            editingExpense={editingExpense}
+            onUpdateExpense={handleUpdateExpense}
+            onCancelEdit={() => setEditingExpense(null)}
+          />
 
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-3">
               Recent Expenses
             </h2>
-            {/* 2. Pass the delete handler to ExpenseList */}
             <ExpenseList
               expenses={expenses}
+              onEditExpense={setEditingExpense}
               onDeleteExpense={handleDeleteExpense}
             />
           </section>

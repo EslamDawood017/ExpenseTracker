@@ -3,10 +3,11 @@ import type { Expense } from '../types/expense'
 
 interface ExpenseCardProps {
     expense: Expense
+    onEdit: (expense: Expense) => void
     onDelete: (id: string) => void
 }
 
-export function ExpenseCard({ expense, onDelete }: ExpenseCardProps) {
+export function ExpenseCard({ expense, onEdit, onDelete }: ExpenseCardProps) {
     return (
         <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow transition-shadow">
             <div className="flex flex-col gap-1">
@@ -22,10 +23,17 @@ export function ExpenseCard({ expense, onDelete }: ExpenseCardProps) {
                 </div>
             </div>
 
-            <div className="flex items-center gap-4">
-                <span className="text-lg font-bold text-slate-900">
+            <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-slate-900 mr-2">
                     ${expense.amount.toFixed(2)}
                 </span>
+                <Button
+                    appearance="outline"
+                    size="small"
+                    onClick={() => onEdit(expense)}
+                >
+                    Edit
+                </Button>
                 <Button
                     appearance="subtle"
                     size="small"
