@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FluentProvider, webLightTheme } from '@fluentui/react-components'
 import type { Expense } from './types/expense'
 import { ExpenseList } from './components/ExpenseList'
 import { ExpenseForm } from './components/ExpenseForm'
 import { ExpenseSummary } from './components/ExpenseSummary'
 import { ExpenseFilters } from './components/ExpenseFilters'
+
+const STORAGE_KEY = 'expense_tracker_data'
 
 const INITIAL_EXPENSES: Expense[] = [
   {
@@ -31,12 +33,28 @@ const INITIAL_EXPENSES: Expense[] = [
 ]
 
 function App() {
-  const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES)
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
+  // 1. Lazy state initialization: loads from localStorage on initial render
+  const [expenses, setExpenses] = useState<Expense[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      try {
+        return JSON.parse(saved) as Expense[]
+      } catch (e) {
+        console.error('Failed to parse stored expenses:', e)
+        return INITIAL_EXPENSES
+      }
+    }
+    return INITIAL_EXPENSES
+  })
 
-  // 1. Filter criteria states
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+
+  // 2. Side Effect: Automatically saves expenses to localStorage whenever state changes
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses))
+  }, [expenses])
 
   const handleAddExpense = (newExpenseData: Omit<Expense, 'id'>) => {
     const newExpense: Expense = {
@@ -62,7 +80,6 @@ function App() {
     }
   }
 
-  // 2. Pure derived data: filtered list recalculated on every render
   const filteredExpenses = expenses.filter((expense) => {
     const matchesSearch = expense.title
       .toLowerCase()
@@ -86,7 +103,6 @@ function App() {
             </p>
           </header>
 
-          {/* Overall summary shows all expenses */}
           <ExpenseSummary expenses={expenses} />
 
           <ExpenseForm
@@ -109,7 +125,6 @@ function App() {
               )}
             </div>
 
-            {/* Filter controls */}
             <ExpenseFilters
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -117,7 +132,6 @@ function App() {
               onCategoryChange={setSelectedCategory}
             />
 
-            {/* Pass the derived filtered list to ExpenseList */}
             <ExpenseList
               expenses={filteredExpenses}
               onEditExpense={setEditingExpense}
